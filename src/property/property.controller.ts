@@ -1,4 +1,16 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseBoolPipe,
+  ParseIntPipe, Patch,
+  Post,
+  Query,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
+import { CreatePropertyDto } from './dto/createProperty.dto';
 
 @Controller('property')
 export class PropertyController {
@@ -7,18 +19,40 @@ export class PropertyController {
     return 'All Properties';
   }
 
-  // @Post(':id')
-  // findOne(@Param('id') id: string) {
-  //   return id;
-  // }
-
-  @Get(':id/:slug')
-  findOne(@Param('id') id, @Param('slug') slug) {
-    return `id =${id}, slug =${slug}`;
+  @Get(':id')
+  findOne(
+    @Param('id', ParseIntPipe) id: string,
+    @Query('sort', ParseBoolPipe) sort,
+  ) {
+    console.log(sort);
+    return id;
   }
 
+  // @Get(':id/:slug')
+  // findOne(@Param('id') id, @Param('slug') slug) {
+  //   return `id =${id}, slug =${slug}`;
+  // }
+
   @Post()
-  create(@Body('name') name) {
-    return name;
+  // @UsePipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }))
+  create(
+    @Body(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        groups: ['create'],
+      }),
+    )
+    body: CreatePropertyDto,
+  ) {
+    return body;
+  }
+
+  @Patch(':id')
+  update(
+    @Body(new ValidationPipe({ whitelist: true, groups: ['update'] }))
+    body: CreatePropertyDto,
+  ) {
+    return body;
   }
 }
